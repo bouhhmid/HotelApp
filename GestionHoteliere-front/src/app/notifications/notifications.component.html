@@ -1,0 +1,35 @@
+<!-- src/app/pages/notifications/notifications.component.html -->
+<h2>Notifications</h2>
+
+<div *ngIf="loading">Chargement…</div>
+
+<table class="table" *ngIf="!loading && rows.length > 0">
+  <thead>
+  <tr>
+    <th>Titre</th>
+    <th>Message</th>
+    <th>Date</th>
+    <th>Lu</th>
+    <th>Action</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let n of rows">
+    <td>{{ n.titre }}</td>
+    <td>{{ n.message }}</td>
+    <td>{{ n.dateEnvoi | date:'short' }}</td>
+    <td>{{ n.lu ? 'Oui' : 'Non' }}</td>
+    <td>
+      <button class="btn-small" (click)="markAsRead(n)" [disabled]="n.lu">Marquer comme lue</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<div *ngIf="!loading && rows.length === 0" class="muted">Aucune notification.</div>
+
+<div class="pager" *ngIf="totalPages > 1">
+  <button (click)="prev()" [disabled]="pageIndex === 0">Précédent</button>
+  <span>Page {{ pageIndex + 1 }} / {{ totalPages }} ({{ totalElements }} éléments)</span>
+  <button (click)="next()" [disabled]="pageIndex + 1 >= totalPages">Suivant</button>
+</div>

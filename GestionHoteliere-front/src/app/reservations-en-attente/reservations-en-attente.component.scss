@@ -1,0 +1,526 @@
+// Variables
+$primary-color: #007bff;
+$primary-hover: #0056b3;
+$success-color: #28a745;
+$success-hover: #1e7e34;
+$danger-color: #dc3545;
+$danger-hover: #c82333;
+$warning-color: #ffc107;
+$info-color: #17a2b8;
+$light-color: #f8f9fa;
+$dark-color: #343a40;
+$border-color: #dee2e6;
+$text-muted: #6c757d;
+$shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+$shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.15);
+$border-radius: 12px;
+$transition: all 0.3s ease;
+
+// Container principal
+.reservations-attente {
+  padding: 2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  // Titre principal
+  h2 {
+    color: $dark-color;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(135deg, $primary-color, $primary-hover);
+      border-radius: 2px;
+    }
+  }
+
+  // État de chargement
+  > div:first-of-type {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: $border-radius;
+    box-shadow: $shadow;
+    font-size: 1.2rem;
+    color: $text-muted;
+    margin-bottom: 2rem;
+    
+    &::after {
+      content: '';
+      width: 24px;
+      height: 24px;
+      border: 3px solid $primary-color;
+      border-top: 3px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 1rem;
+    }
+  }
+
+  // Messages d'erreur
+  .error {
+    background: linear-gradient(135deg, #f8d7da, #f1aeb5);
+    color: #721c24;
+    padding: 1.5rem 2rem;
+    border-radius: $border-radius;
+    border: 1px solid #f5c6cb;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    box-shadow: $shadow;
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: '⚠️';
+      font-size: 1.5rem;
+      margin-right: 1rem;
+    }
+  }
+
+  // Tableau principal
+  .table {
+    width: 100%;
+    background: white;
+    border-radius: $border-radius;
+    overflow: hidden;
+    box-shadow: $shadow;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+
+    thead {
+      background: linear-gradient(135deg, $dark-color, #495057);
+      color: white;
+
+      th {
+        padding: 1.5rem 1.25rem;
+        text-align: left;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: none;
+        position: relative;
+
+        &:not(:last-child)::after {
+          content: '';
+          position: absolute;
+          right: 0;
+          top: 25%;
+          height: 50%;
+          width: 1px;
+          background: rgba(255, 255, 255, 0.2);
+        }
+      }
+    }
+
+    tbody {
+      tr {
+        transition: $transition;
+        border-bottom: 1px solid #f8f9fa;
+
+        &:hover {
+          background: linear-gradient(135deg, rgba(0, 123, 255, 0.05), rgba(0, 123, 255, 0.02));
+          transform: translateX(2px);
+          box-shadow: inset 4px 0 0 $primary-color;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        td {
+          padding: 1.25rem;
+          color: $dark-color;
+          font-size: 0.95rem;
+          vertical-align: middle;
+          border: none;
+
+          // Badge pour le type
+          .badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            background: linear-gradient(135deg, $info-color, #138496);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
+          }
+
+          // Boutons d'action
+          button {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: $transition;
+            margin-right: 0.75rem;
+            position: relative;
+            overflow: hidden;
+
+            &:last-child {
+              margin-right: 0;
+            }
+
+            // Animation d'ondulation
+            &::before {
+              content: '';
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              width: 0;
+              height: 0;
+              border-radius: 50%;
+              background: rgba(255, 255, 255, 0.3);
+              transform: translate(-50%, -50%);
+              transition: width 0.4s, height 0.4s;
+            }
+
+            &:active::before {
+              width: 200px;
+              height: 200px;
+            }
+
+            &.btn-primary {
+              background: linear-gradient(135deg, $success-color, $success-hover);
+              color: white;
+
+              &:hover {
+                background: linear-gradient(135deg, $success-hover, #155724);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+              }
+
+              &:active {
+                transform: translateY(0);
+              }
+            }
+
+            &.btn-danger {
+              background: linear-gradient(135deg, $danger-color, $danger-hover);
+              color: white;
+
+              &:hover {
+                background: linear-gradient(135deg, $danger-hover, #a71e2a);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+              }
+
+              &:active {
+                transform: translateY(0);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Message "Aucune réservation"
+  .muted {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: $border-radius;
+    box-shadow: $shadow;
+    color: $text-muted;
+    font-size: 1.2rem;
+    font-style: italic;
+    margin-bottom: 2rem;
+
+    &::before {
+      content: '📋';
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+  }
+
+  // Pagination
+  .pager {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem;
+    background: white;
+    border-radius: $border-radius;
+    box-shadow: $shadow;
+
+    button {
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, $primary-color, $primary-hover);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: $transition;
+      min-width: 120px;
+
+      &:hover:not(:disabled) {
+        background: linear-gradient(135deg, $primary-hover, #004085);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+      }
+
+      &:disabled {
+        background: linear-gradient(135deg, #6c757d, #5a6268);
+        cursor: not-allowed;
+        opacity: 0.6;
+        transform: none;
+        box-shadow: none;
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+      }
+    }
+
+    span {
+      color: $dark-color;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0 1rem;
+      white-space: nowrap;
+    }
+  }
+}
+
+// Animations
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// Animation d'entrée pour les éléments
+.reservations-attente {
+  h2,
+  .table,
+  .muted,
+  .pager {
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  .table tbody tr {
+    animation: slideInRight 0.4s ease-out;
+    animation-fill-mode: both;
+
+    @for $i from 1 through 10 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{$i * 0.05}s;
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 1200px) {
+  .reservations-attente {
+    padding: 1.5rem;
+
+    .table {
+      thead th,
+      tbody td {
+        padding: 1rem;
+      }
+
+      tbody td button {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+        margin-right: 0.5rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .reservations-attente {
+    padding: 1rem;
+
+    h2 {
+      font-size: 1.6rem;
+    }
+
+    .table {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+
+      thead th,
+      tbody td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+      }
+
+      tbody td button {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+        margin: 0.2rem;
+        display: block;
+        width: 100%;
+        min-width: 80px;
+      }
+    }
+
+    .pager {
+      flex-direction: column;
+      gap: 1rem;
+
+      button {
+        min-width: 100px;
+      }
+
+      span {
+        font-size: 0.9rem;
+        text-align: center;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .reservations-attente {
+    .table {
+      thead th,
+      tbody td {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+      }
+
+      tbody td {
+        &:last-child {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        button {
+          margin: 0;
+        }
+      }
+    }
+
+    .pager {
+      padding: 1rem;
+
+      button {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+      }
+    }
+  }
+}
+
+// Thème sombre (optionnel)
+@media (prefers-color-scheme: dark) {
+  .reservations-attente {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    color: #e2e8f0;
+
+    h2 {
+      color: #e2e8f0;
+    }
+
+    .table,
+    .muted,
+    .pager {
+      background: #2d3748;
+      color: #e2e8f0;
+    }
+
+    .table {
+      thead {
+        background: linear-gradient(135deg, #1a202c, #2d3748);
+      }
+
+      tbody tr {
+        border-bottom-color: #4a5568;
+
+        &:hover {
+          background: linear-gradient(135deg, rgba(116, 129, 141, 0.1), rgba(116, 129, 141, 0.05));
+        }
+
+        td {
+          color: #e2e8f0;
+        }
+      }
+    }
+
+    .error {
+      background: linear-gradient(135deg, #fed7d7, #feb2b2);
+      color: #c53030;
+    }
+  }
+}
+
+// États de chargement améliorés
+.loading-skeleton {
+  .table tbody tr td {
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+      );
+      transform: translateX(-100%);
+      animation: shimmer 1.5s infinite;
+    }
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}

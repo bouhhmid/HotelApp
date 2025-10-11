@@ -1,0 +1,19 @@
+.ai-card {
+  background: #fff; border-radius: 16px; padding: 14px 16px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.06);
+}
+.ai-card__head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.ai-card__title { font-weight:700; display:flex; align-items:center; gap:8px; }
+.ai-card__meta { font-size:12px; color:#6b7280; }
+.ai-card__spark { height:60px; margin:4px 0 10px; }
+.ai-card__body { display:flex; gap:10px; align-items:flex-start; }
+.ai-card__text { margin: 0; line-height: 1.4; }
+
+.chip { background:#eef2ff; color:#4338ca; font-size:12px; padding:2px 8px; border-radius:999px; white-space:nowrap; }
+
+.muted { color:#9ca3af; }
+.loading .skeleton{ background:linear-gradient(90deg,#eee 25%,#f7f7f7 37%,#eee 63%); animation:s 1.2s infinite; border-radius:8px;}
+.skeleton.head{height:18px;width:40%;}
+.skeleton.spark{height:60px;margin-top:8px;}
+.skeleton.text{height:36px;margin-top:8px;}
+@keyframes s{0%{background-position:-200px 0}100%{background-position:200px 0}}

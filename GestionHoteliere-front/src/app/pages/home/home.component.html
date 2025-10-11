@@ -1,0 +1,376 @@
+<!-- NAVBAR PROFESSIONNELLE -->
+<nav class="navbar">
+  <div class="navbar-left">
+    <a href="#" class="logo" (click)="scrollToTop()">
+      <i class="fas fa-hotel"></i>
+      <strong>GestionHôtelière</strong>
+    </a>
+  </div>
+
+  <!-- Utilisateur connecté -->
+  <div class="navbar-right" *ngIf="isLoggedIn">
+    <div class="user-info">
+      <div class="user-avatar">
+        <i class="fas fa-user"></i>
+      </div>
+      <span class="user-name">{{ userName }}</span>
+    </div>
+    <button class="btn-logout" (click)="logout()">
+      <i class="fas fa-sign-out-alt"></i>
+      Déconnexion
+    </button>
+    <a class="btn-primary" [routerLink]="['/mes-reservations']">
+      <i class="fas fa-calendar-check"></i>
+      Mes Réservations
+    </a>
+  </div>
+
+  <!-- Utilisateur non connecté -->
+  <div class="navbar-right" *ngIf="!isLoggedIn">
+    <button class="btn-primary" (click)="login()">
+      <i class="fas fa-sign-in-alt"></i>
+      Connexion
+    </button>
+  </div>
+</nav>
+
+<!-- CONTENEUR PRINCIPAL -->
+<div class="main-container">
+  
+  <!-- SECTION HEADER -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="fas fa-hotel"></i>
+      </div>
+      <h1 class="header-title">Gestion Hôtelière</h1>
+      <p class="header-subtitle">Trouvez l'hébergement parfait pour votre séjour</p>
+    </div>
+  </div>
+
+  <!-- MESSAGE DE BIENVENUE POUR NON-CONNECTÉS -->
+  <div class="welcome-card" *ngIf="!isLoggedIn">
+    <div class="welcome-icon">
+      <i class="fas fa-key"></i>
+    </div>
+    <h3>Connectez-vous pour réserver</h3>
+    <p>Accédez à des tarifs exclusifs et gérez vos réservations facilement</p>
+    <button class="btn-welcome" (click)="login()">
+      <i class="fas fa-sign-in-alt"></i>
+      Se connecter
+    </button>
+  </div>
+
+  <!-- FILTRES DE RECHERCHE -->
+  <div class="filters-section">
+    <div class="filters-header">
+      <h3><i class="fas fa-search"></i> Rechercher un hôtel</h3>
+      <button class="btn-reset" (click)="resetFilters()">
+        <i class="fas fa-refresh"></i>
+        Réinitialiser
+      </button>
+    </div>
+
+    <div class="filters-grid">
+      <!-- Nom de l'hôtel -->
+      <div class="form-group">
+        <label for="hotel-name">Nom de l'hôtel</label>
+        <input 
+          id="hotel-name"
+          type="text" 
+          [(ngModel)]="filter.nom" 
+          placeholder="Nom de l'hôtel..." 
+          class="form-input"
+        />
+      </div>
+
+      <!-- Classification -->
+      <div class="form-group">
+        <label for="hotel-stars">Classification</label>
+        <select id="hotel-stars" [(ngModel)]="filter.etoiles" class="form-select">
+          <option [ngValue]="null">Toutes les étoiles</option>
+          <option *ngFor="let e of [1,2,3,4,5]" [ngValue]="e">
+            {{ e }} étoile{{ e > 1 ? 's' : '' }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Localisation -->
+      <div class="form-group">
+        <label for="hotel-location">Ville</label>
+        <input 
+          id="hotel-location"
+          type="text" 
+          [(ngModel)]="filter.adresse" 
+          placeholder="Ville ou région..." 
+          class="form-input"
+        />
+      </div>
+    </div>
+
+    <!-- Capacités -->
+    <div class="capacity-section">
+      <h4>Capacité souhaitée</h4>
+      <div class="capacity-grid">
+        <div class="capacity-item">
+          <label>Adultes</label>
+          <div class="number-control">
+            <button type="button" (click)="filter.adultes = filter.adultes > 1 ? filter.adultes - 1 : 1">-</button>
+            <input type="number" min="1" [(ngModel)]="filter.adultes" readonly />
+            <button type="button" (click)="filter.adultes = filter.adultes + 1">+</button>
+          </div>
+        </div>
+
+        <div class="capacity-item">
+          <label>Enfants</label>
+          <div class="number-control">
+            <button type="button" (click)="filter.enfants = filter.enfants > 0 ? filter.enfants - 1 : 0">-</button>
+            <input type="number" min="0" [(ngModel)]="filter.enfants" readonly />
+            <button type="button" (click)="filter.enfants = filter.enfants + 1">+</button>
+          </div>
+        </div>
+
+        <div class="capacity-item">
+          <label>Chambres</label>
+          <div class="number-control">
+            <button type="button" (click)="filter.chambres = filter.chambres > 1 ? filter.chambres - 1 : 1">-</button>
+            <input type="number" min="1" [(ngModel)]="filter.chambres" readonly />
+            <button type="button" (click)="filter.chambres = filter.chambres + 1">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nombre de résultats -->
+    <div class="results-info" *ngIf="!isLoading">
+      {{ filteredHotels.length }} hôtel{{ filteredHotels.length > 1 ? 's' : '' }} trouvé{{ filteredHotels.length > 1 ? 's' : '' }}
+    </div>
+  </div>
+
+  <!-- CHARGEMENT -->
+  <div class="loading-section" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p>Chargement des hôtels...</p>
+  </div>
+
+  <!-- LISTE DES HÔTELS -->
+  <div class="hotels-grid" *ngIf="!isLoading && hotels && hotels.length > 0; else noHotels">
+    <div 
+      class="hotel-card"
+      [class.premium]="isPremiumHotel(hotel)"
+      *ngFor="let hotel of filteredHotels; trackBy: trackByHotelId"
+    >
+      <!-- Image de l'hôtel -->
+      <div class="hotel-image">
+        <img 
+          [src]="hotel.imageUrl 
+            ? (hotel.imageUrl.startsWith('http')
+                ? hotel.imageUrl
+                : 'assets/images/hotels/' + hotel.imageUrl)
+            : 'assets/images/hotels/default.jpg'"
+          [alt]="hotel.nom"
+          (error)="onImageError($event)"
+        />
+        
+        <!-- Badge Premium -->
+        <div class="premium-badge" *ngIf="isPremiumHotel(hotel)">
+          <i class="fas fa-crown"></i>
+          PREMIUM
+        </div>
+      </div>
+
+      <!-- Contenu de la carte -->
+      <div class="hotel-content">
+        <!-- Étoiles -->
+        <div class="hotel-rating" *ngIf="hotel.etoiles">
+          <i class="fas fa-star" *ngFor="let star of getStarsArray(hotel.etoiles)"></i>
+          <span class="rating-text">{{ hotel.etoiles }} étoile{{ hotel.etoiles > 1 ? 's' : '' }}</span>
+        </div>
+
+        <!-- Titre -->
+        <h3 class="hotel-name">{{ hotel.nom }}</h3>
+
+        <!-- Localisation -->
+        <div class="hotel-location" *ngIf="hotel.ville || hotel.adresse">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>{{ hotel.ville || hotel.adresse }}</span>
+        </div>
+
+        <!-- Description -->
+        <p class="hotel-description" *ngIf="hotel.description">
+          {{ hotel.description }}
+        </p>
+
+        <!-- Prix -->
+        <div class="hotel-price" *ngIf="hotel.prix">
+          <span class="price">{{ hotel.prix }}€</span>
+          <span class="period">/ nuit</span>
+        </div>
+
+        <!-- Capacités -->
+        <div class="hotel-capacity" *ngIf="hotel.capaciteAdulte || hotel.capaciteEnfant || hotel.capaciteChambre">
+          <span *ngIf="hotel.capaciteAdulte" class="capacity-item">
+            <i class="fas fa-user"></i> {{ hotel.capaciteAdulte }}
+          </span>
+          <span *ngIf="hotel.capaciteEnfant" class="capacity-item">
+            <i class="fas fa-child"></i> {{ hotel.capaciteEnfant }}
+          </span>
+          <span *ngIf="hotel.capaciteChambre" class="capacity-item">
+            <i class="fas fa-bed"></i> {{ hotel.capaciteChambre }}
+          </span>
+        </div>
+
+        <!-- Bouton détails -->
+        <a 
+          class="btn-details"
+          [routerLink]="['/hotel', hotel.id]"
+          (click)="onDetailsClick($event)"
+        >
+          <i class="fas fa-eye"></i>
+          Voir détails
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUCUN HÔTEL -->
+  <ng-template #noHotels>
+    <div class="no-hotels">
+      <div class="no-hotels-icon">
+        <i class="fas fa-hotel"></i>
+      </div>
+      <h3>
+        <span *ngIf="filteredHotels.length === 0 && hotels.length > 0; else noHotelsMessage">
+          Aucun hôtel trouvé
+        </span>
+        <ng-template #noHotelsMessage>
+          Aucun hôtel disponible
+        </ng-template>
+      </h3>
+      <p *ngIf="filteredHotels.length === 0 && hotels.length > 0; else noHotelsText">
+        Essayez de modifier vos critères de recherche.
+      </p>
+      <ng-template #noHotelsText>
+        <p>Les hôtels seront bientôt disponibles.</p>
+      </ng-template>
+      
+      <button 
+        class="btn-primary" 
+        (click)="resetFilters()"
+        *ngIf="filteredHotels.length === 0 && hotels.length > 0"
+      >
+        Effacer les filtres
+      </button>
+    </div>
+  </ng-template>
+
+<!-- Conteneur principal du chatbot -->
+<div class="chatbot-container">
+  <!-- Bouton d'ouverture/fermeture -->
+  <button 
+    class="chatbot-toggle"
+    [class.open]="isOpen"
+    [class.has-notification]="hasUnreadMessages"
+    (click)="toggleChat()"
+    aria-label="Ouvrir l'assistant virtuel"
+  >
+    <i class="fas" [ngClass]="isOpen ? 'fa-times' : 'fa-comments'"></i>
+  </button>
+
+  <!-- Fenêtre du chatbot -->
+  <div class="chatbot-window" [class.open]="isOpen">
+    <!-- Header -->
+    <div class="chatbot-header">
+      <div class="header-info">
+        <div class="bot-avatar">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div class="bot-details">
+          <div class="bot-name">Assistant Hôtelier</div>
+          <div class="bot-status">
+            <span class="status-dot"></span>
+            En ligne - Répond habituellement en quelques minutes
+          </div>
+        </div>
+      </div>
+      <button class="close-btn" (click)="closeChat()" aria-label="Fermer">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="chatbot-messages" #messagesContainer>
+      <div class="welcome-message" *ngIf="messages.length === 0">
+        <div class="welcome-text">
+          <span class="greeting">👋 Bonjour et bienvenue !</span>
+          Je suis votre assistant virtuel pour la gestion hôtelière. 
+          Je peux vous aider à trouver des informations sur nos hôtels, 
+          les réservations, les prix et bien plus encore.
+        </div>
+        <div class="quick-actions">
+          <button class="action-btn" (click)="sendQuickMessage('Voir les hôtels disponibles')">
+            🏨 Hôtels disponibles
+          </button>
+          <button class="action-btn" (click)="sendQuickMessage('Informations sur les prix')">
+            💰 Prix et tarifs
+          </button>
+          <button class="action-btn" (click)="sendQuickMessage('Comment réserver ?')">
+            📅 Comment réserver
+          </button>
+          <button class="action-btn" (click)="sendQuickMessage('Contacter le support')">
+            💬 Support client
+          </button>
+        </div>
+      </div>
+
+      <div 
+        *ngFor="let message of messages; trackBy: trackByMessageId"
+        class="message"
+        [ngClass]="{'user': message.isUser, 'bot': !message.isUser}"
+      >
+        <div class="message-bubble">
+          {{ message.text }}
+        </div>
+      </div>
+
+      <div class="typing-indicator" *ngIf="isTyping">
+        <div class="typing-dots">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <span class="typing-text">L'assistant écrit...</span>
+      </div>
+    </div>
+
+    <div class="chatbot-input">
+      <div class="input-container">
+       <textarea
+  #messageInput
+  class="message-input"
+  [(ngModel)]="currentMessage"
+  placeholder="Tapez votre message..."
+  (keydown.enter)="sendMessage(); $event.preventDefault()"
+  (input)="onInputChange()"
+  rows="1"
+  maxlength="500"
+></textarea>
+
+        <button 
+          class="send-btn"
+          (click)="sendMessage()"
+          [disabled]="!currentMessage.trim() || isTyping"
+          aria-label="Envoyer le message"
+        >
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<!-- BOUTON RETOUR EN HAUT -->
+<button class="scroll-top" (click)="scrollToTop()">
+  <i class="fas fa-chevron-up"></i>
+</button>

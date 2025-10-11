@@ -1,0 +1,50 @@
+<div class="panel housekeeping-panel">
+  <div class="panel-header">
+    <h3>Housekeeping (aujourd’hui)</h3>
+    <span class="muted">
+      Arrivées: {{ counts.arrivals }} · Départs: {{ counts.departures }} · Stayovers: {{ counts.stayovers }}
+    </span>
+  </div>
+
+  <div *ngIf="loading" class="loading">Chargement…</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div class="table-container" *ngIf="!loading && !error && tasks.length; else noHK">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Chambre</th>
+          <th>Type</th>
+          <th>Priorité</th>
+          <th>Heure cible</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of tasks | slice:0:20">
+          <td>{{ t.room }}</td>
+          <td>
+            <span class="badge"
+              [ngClass]="{
+                'badge-info': t.type==='ARRIVAL',
+                'badge-danger': t.type==='DEPARTURE',
+                'badge-warning': t.type==='STAYOVER'
+              }">{{ t.type }}</span>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="{ 'badge-danger': t.priority===1, 'badge-secondary': t.priority!==1 }">
+              {{ t.priority === 1 ? 'Haute' : 'Normale' }}
+            </span>
+          </td>
+          <td>{{ t.dueTime }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #noHK>
+    <div class="empty-state">
+      <i class="fas fa-broom"></i>
+      <p>Aucune tâche aujourd’hui.</p>
+    </div>
+  </ng-template>
+</div>

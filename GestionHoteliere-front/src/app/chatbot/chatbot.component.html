@@ -1,0 +1,15 @@
+<div class="chatbot-container">
+  <div class="chat-header">🤖 Assistant Hôtelier</div>
+
+  <div class="chat-messages">
+    <div *ngFor="let msg of messages" [ngClass]="msg.sender">
+      <span class="icon">{{ msg.sender === 'bot' ? '🤖' : '🙋' }}</span>
+      <span class="text" [innerHTML]="formaterMessage(msg.text)"></span>
+    </div>
+  </div>
+
+  <div class="chat-input">
+    <input type="text" [(ngModel)]="userMessage" (keydown.enter)="envoyer()" placeholder="Posez une question..." />
+    <button (click)="envoyer()">Envoyer</button>
+  </div>
+</div>

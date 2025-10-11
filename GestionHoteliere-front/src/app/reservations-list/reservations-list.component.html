@@ -1,0 +1,10 @@
+<table>
+  <tr *ngFor="let reservation of reservations">
+    <td>{{ reservation.id }}</td>
+    <td>{{ reservation.dateReservation }}</td>
+    <td>{{ reservation.statut }}</td>
+    <td>
+      <button (click)="goToDetail(reservation.id)">Voir les détails</button>
+    </td>
+  </tr>
+</table>

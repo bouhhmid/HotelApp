@@ -1,0 +1,33 @@
+<div class="ai-card" *ngIf="!loading; else loadingTpl">
+  <div class="ai-card__head">
+    <div class="ai-card__title">
+      <i class="fas fa-robot"></i> AI Insights
+    </div>
+    <div class="ai-card__meta" *ngIf="insight?.generatedAt">
+      {{ insight?.generatedAt | date:'short' }}
+    </div>
+  </div>
+
+  <div class="ai-card__spark">
+    <canvas #spark height="60"></canvas>
+  </div>
+
+  <div class="ai-card__body">
+    <div class="chip" *ngIf="insight?.type">{{ insight?.type }}</div>
+    <p class="ai-card__text" *ngIf="insight?.insight; else emptyTpl">
+      {{ insight?.insight }}
+    </p>
+  </div>
+</div>
+
+<ng-template #loadingTpl>
+  <div class="ai-card loading">
+    <div class="skeleton head"></div>
+    <div class="skeleton spark"></div>
+    <div class="skeleton text"></div>
+  </div>
+</ng-template>
+
+<ng-template #emptyTpl>
+  <p class="muted">Aucune recommandation disponible.</p>
+</ng-template>

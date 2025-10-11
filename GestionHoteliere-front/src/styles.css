@@ -1,0 +1,15 @@
+/* You can add global styles to this file, and also import other style files */
+@import 'swiper/css';
+@import 'swiper/css/navigation';
+@import 'swiper/css/pagination';
+/* Empêche Bootstrap/Material de déformer les tuiles Leaflet
+   (provoque l'effet "mosaïque" si absent) */
+.leaflet-container img {
+  max-width: none !important;
+}
+
+/* Sécurité : la carte occupe bien tout l'espace */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+}

@@ -1,0 +1,39 @@
+<!-- src/app/pages/reservations-en-attente/reservations-en-attente.component.html -->
+<h2>Réservations en attente</h2>
+
+<div *ngIf="loading">Chargement…</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<table class="table" *ngIf="!loading && rows.length > 0">
+  <thead>
+  <tr>
+    <th>#</th>
+    <th>Début</th>
+    <th>Fin</th>
+    <th>Type</th>
+    <th>Statut</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let r of rows">
+    <td>{{ r.id }}</td>
+    <td>{{ r.dateDebut | date:'short' }}</td>
+    <td>{{ r.dateFin | date:'short' }}</td>
+    <td><span class="badge" *ngIf="r.chambreId; else svc">CHAMBRE</span><ng-template #svc>SERVICE</ng-template></td>
+    <td>{{ r.statut }}</td>
+    <td>
+      <button class="btn-primary" (click)="confirmer(r)">Confirmer</button>
+      <button class="btn-danger" (click)="annuler(r)">Annuler</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<div *ngIf="!loading && rows.length === 0" class="muted">Aucune réservation en attente.</div>
+
+<div class="pager" *ngIf="totalPages > 1">
+  <button (click)="prev()" [disabled]="pageIndex === 0">Précédent</button>
+  <span>Page {{ pageIndex + 1 }} / {{ totalPages }} ({{ totalElements }} éléments)</span>
+  <button (click)="next()" [disabled]="pageIndex + 1 >= totalPages">Suivant</button>
+</div>

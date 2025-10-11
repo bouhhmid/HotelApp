@@ -1,0 +1,39 @@
+.dispo-list {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  gap: 8px;
+  padding: 0;
+}
+
+.dispo-list li {
+  background-color: #e0f7fa;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+.reservation-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #0056b3;
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+button.btn-primary {
+  background-color: #0056b3;
+  color: white;
+  border-radius: 8px;
+  font-size: 1rem;
+  padding: 10px 0;
+  width: 100%;
+  transition: background-color 0.2s ease;
+}
+
+button.btn-primary:hover {
+  background-color: #004494;
+}

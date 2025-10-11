@@ -1,0 +1,125 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="reservation-form-container">
+
+  <!-- Option de chambre (si disponible) -->
+  <mat-form-field *ngIf="options.length" appearance="fill" class="reservation-field">
+    <mat-label>Option (facultatif)</mat-label>
+    <mat-select [(value)]="optionId">
+      <mat-option [value]="null">— Sans option (prix standard) —</mat-option>
+      <mat-option *ngFor="let opt of options" [value]="opt.id">
+        {{ opt.typeChambre }} — Vue: {{ opt.vue }} — {{ opt.prixParNuitParPersonne | currency:'TND':'symbol':'1.0-3' }}
+      </mat-option>
+    </mat-select>
+    <mat-hint>Sélectionne une option pour appliquer son tarif.</mat-hint>
+  </mat-form-field>
+
+  <!-- Date d'arrivée (chambre / option) -->
+  <mat-form-field *ngIf="type === 'chambre' || type === 'option'" appearance="fill" class="reservation-field">
+    <mat-label>Date d'arrivée</mat-label>
+    <input
+      matInput
+      [matDatepicker]="picker1"
+      [matDatepickerFilter]="dateDisponible"
+      formControlName="dateDebut"
+      autocomplete="off">
+    <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+    <mat-datepicker #picker1></mat-datepicker>
+    <mat-error *ngIf="form.get('dateDebut')?.hasError('required')">Requise</mat-error>
+  </mat-form-field>
+
+  <!-- Date de départ (chambre / option) -->
+  <mat-form-field *ngIf="type === 'chambre' || type === 'option'" appearance="fill" class="reservation-field">
+    <mat-label>Date de départ</mat-label>
+    <input
+      matInput
+      [matDatepicker]="picker2"
+      [matDatepickerFilter]="dateFinDisponible"
+      [min]="form.value.dateDebut || null"
+      formControlName="dateFin"
+      autocomplete="off">
+    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+    <mat-datepicker #picker2></mat-datepicker>
+    <mat-error *ngIf="form.get('dateFin')?.hasError('required')">Requise</mat-error>
+    <mat-hint *ngIf="form.value.dateDebut">À partir du {{ form.value.dateDebut | date:'mediumDate' }}</mat-hint>
+  </mat-form-field>
+
+  <!-- Date (service) -->
+  <mat-form-field *ngIf="type === 'service'" appearance="fill" class="reservation-field">
+    <mat-label>Date</mat-label>
+    <input
+      matInput
+      [matDatepicker]="pickerService"
+      [matDatepickerFilter]="alwaysTrue"
+      formControlName="date"
+      autocomplete="off">
+    <mat-datepicker-toggle matSuffix [for]="pickerService"></mat-datepicker-toggle>
+    <mat-datepicker #pickerService></mat-datepicker>
+    <mat-error *ngIf="form.get('date')?.hasError('required')">Requise</mat-error>
+  </mat-form-field>
+
+  <!-- Heure (service) -->
+  <mat-form-field *ngIf="type === 'service'" appearance="fill" class="reservation-field">
+    <mat-label>Heure</mat-label>
+    <input matInput type="time" formControlName="heure">
+    <mat-error *ngIf="form.get('heure')?.hasError('required')">Requise</mat-error>
+  </mat-form-field>
+
+  <!-- Adultes (chambre / option) -->
+  <mat-form-field *ngIf="type === 'chambre' || type === 'option'" appearance="fill" class="reservation-field">
+    <mat-label>Nombre d'adultes</mat-label>
+    <input matInput type="number" min="1" formControlName="nbAdultes">
+    <mat-error *ngIf="form.get('nbAdultes')?.invalid">Min 1</mat-error>
+  </mat-form-field>
+
+  <!-- Enfants (chambre / option) -->
+  <mat-form-field *ngIf="type === 'chambre' || type === 'option'" appearance="fill" class="reservation-field">
+    <mat-label>Nombre d'enfants</mat-label>
+    <input matInput type="number" min="0" formControlName="nbEnfants">
+  </mat-form-field>
+
+  <!-- Chambres (chambre / option) -->
+  <mat-form-field *ngIf="type === 'chambre' || type === 'option'" appearance="fill" class="reservation-field">
+    <mat-label>Nombre de chambres</mat-label>
+    <input matInput type="number" min="1" formControlName="nbChambres">
+    <mat-error *ngIf="form.get('nbChambres')?.invalid">Min 1</mat-error>
+  </mat-form-field>
+
+  <!-- Participants (service) -->
+  <mat-form-field *ngIf="type === 'service'" appearance="fill" class="reservation-field">
+    <mat-label>Participants</mat-label>
+    <input matInput type="number" min="1" formControlName="participants">
+    <mat-error *ngIf="form.get('participants')?.invalid">Min 1</mat-error>
+  </mat-form-field>
+
+  <!-- Actions -->
+  <div class="reservation-buttons">
+    <!-- Masqué en mode service (pas de devis implémenté ici) -->
+    <button
+      mat-stroked-button
+      color="accent"
+      type="button"
+      (click)="doQuote()"
+      [disabled]="form.invalid || type === 'service' || loading">
+      <mat-icon fontIcon="price_change" class="mr-2"></mat-icon>
+      Voir le prix
+    </button>
+
+    <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || loading">
+      <mat-icon fontIcon="event_available" class="mr-2"></mat-icon>
+      Réserver
+    </button>
+  </div>
+
+  <!-- Loader + erreurs -->
+  <div class="mt-3" *ngIf="loading">
+    <!-- <mat-progress-bar mode="indeterminate"></mat-progress-bar> -->
+  </div>
+  <mat-error *ngIf="error" class="mt-2">{{ error }}</mat-error>
+
+  <!-- Résultat du devis -->
+  <div *ngIf="quote" class="quote-result card mt-3 p-3">
+    <p><strong>Total :</strong> {{ quote.total | number:'1.0-3' }} {{ quote.currency }}</p>
+    <p>Nuits : {{ quote.nuits }}</p>
+    <p>Taxes : {{ quote.taxes | number:'1.0-3' }}</p>
+  </div>
+
+</form>

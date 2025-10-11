@@ -1,0 +1,98 @@
+:host { position: fixed; inset: 0; z-index: 1000; } /* Assure la couverture écran */
+
+/* Backdrop sombre */
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Contenant blanc centré */
+.overlay-content {
+  width: 90vw;
+  height: 85vh;                    /* HAUTEUR RÉELLE -> indispensable */
+  max-width: 1200px;
+  max-height: 800px;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+/* En-tête */
+.overlay-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: #1f2937; /* gris foncé */
+  color: #fff;
+  border-bottom: 1px solid #111827;
+  flex-shrink: 0;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+}
+
+/* Bouton de fermeture */
+.close-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background .2s ease;
+
+  &:hover { background: rgba(255,255,255,.12); }
+}
+
+/* Le composant carte prend tout l'espace restant */
+app-leaflet-map {
+  flex: 1 1 auto;
+  display: block;
+  min-height: 0; /* important avec flexbox */
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .overlay-content {
+    width: 95vw;
+    height: 90vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .overlay-content {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+}

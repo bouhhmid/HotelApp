@@ -1,0 +1,285 @@
+<!-- Votre HTML avec petites modifications pour header/footer et notifications -->
+<div class="dashboard" *ngIf="loading">
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Chargement du tableau de bord...</p>
+  </div>
+</div>
+
+<div class="dashboard" *ngIf="!loading">
+  <!-- Header avec avatar et notifications -->
+  <header class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <div class="logo">
+          <i class="fas fa-hotel"></i>
+          <h2>Dashboard Admin</h2>
+        </div>
+      </div>
+      
+      <div class="header-right">
+     
+<!-- Notifications dropdown -->
+<div #notifDD class="dropdown notifications" [class.open]="notifOpen" (click)="$event.stopPropagation()">
+  <button class="nav-link pulse" type="button" (click)="toggleNotif()">
+    <i class="fas fa-bell"></i>
+    <span class="notification-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+    <span class="pulse-ring" *ngIf="unreadCount > 0"></span>
+  </button>
+
+  <div class="dropdown-menu" *ngIf="notifOpen">
+    <div class="dropdown-header">
+      <span>Notifications</span>
+      <span class="badge">{{ unreadCount || 0 }}</span>
+    </div>
+
+    <ul class="notif-list">
+      <li *ngFor="let n of notifications; trackBy: trackNotif"
+          class="notif-item"
+          [class.unread]="!n.lu"
+          (click)="openNotification(n); $event.stopPropagation()">
+        <div class="notif-content">
+          <p class="notif-title">
+            <span class="strong">{{ n.titre }}</span>
+            <small>{{ n.dateEnvoi | date:'short':'':currentLang.code }}</small>
+          </p>
+          <span class="notif-message">{{ n.message }}</span>
+        </div>
+      </li>
+
+      <li *ngIf="!notifications || notifications.length === 0" class="notif-empty">
+        <span>Aucune notification</span>
+      </li>
+    </ul>
+
+    <div class="dropdown-footer">
+      <button type="button" class="btn-link" (click)="markAllAsRead()">Tout marquer comme lu</button>
+      <button type="button" class="btn-link" (click)="goToAll()">Voir tout</button>
+    </div>
+  </div>
+</div>
+
+<!-- Langues dropdown -->
+<div #langDD class="dropdown lang" [class.open]="langOpen" (click)="$event.stopPropagation()">
+  <button class="nav-link" type="button"
+          (click)="toggleLang()"
+          [attr.aria-haspopup]="true"
+          [attr.aria-expanded]="langOpen">
+    <img [src]="currentLang.flag" [alt]="currentLang.label" width="22" height="22" />
+  </button>
+
+  <div class="dropdown-menu" *ngIf="langOpen">
+    <ul class="lang-list" role="menu">
+      <li *ngFor="let l of languages"
+          class="lang-item"
+          role="menuitem"
+          (click)="setLang(l.code); $event.stopPropagation()">
+        <img [src]="l.flag" [alt]="l.label" width="20" height="20" />
+        <span>{{ l.label }}</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+        
+        
+        <!-- Avatar et profil -->
+        <div class="profile-section">
+          <img class="avatar" [src]="avatarUrl" [alt]="displayName">
+          <div class="profile-info">
+            <div class="profile-name">{{ displayName }}</div>
+            <div class="profile-role">Administrateur</div>
+          </div>
+        </div>
+        
+        <!-- Bouton déconnexion -->
+        <button class="btn-logout" (click)="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="main-content">
+    <div class="error" *ngIf="error">{{ error }}</div>
+
+    <!-- Sélecteur d'hôtel -->
+  <div class="hotel-actions" *ngIf="hotels.length > 1">
+  <!-- Sélecteur -->
+  <div class="hotel-picker">
+    <label for="hotelId">Hôtel :</label>
+    <select id="hotelId" [(ngModel)]="selectedHotelId" name="hotelId" (ngModelChange)="onHotelChange()">
+      <option *ngFor="let h of hotels" [ngValue]="h.id">
+        {{ h.nom || ('Hôtel #' + h.id) }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Actions rapides -->
+  <div class="quick-actions">
+    <div class="action-buttons">
+      <button class="btn-primary" (click)="goToAjouterChambre()" [disabled]="!selectedHotelId">
+        <i class="fas fa-plus"></i>
+        Ajouter une chambre
+      </button>
+      <button class="btn-secondary" (click)="goToPending()" [disabled]="!selectedHotelId">
+        <i class="fas fa-list"></i>
+        Voir les réservations
+      </button>
+    </div>
+  </div>
+</div>
+
+
+  
+<div class="cards">
+  <!-- Chambres -->
+  <div class="card rooms">
+    <div class="card-header">
+      <div class="card-title">Chambres (hôtel sélectionné)</div>
+      <div class="card-icon"><i class="fas fa-bed"></i></div>
+    </div>
+    <div class="card-value">{{ (summary?.roomsCount ?? roomCount) }}</div>
+    <a class="card-action" (click)="goToAjouterChambre()">Ajouter une chambre</a>
+  </div>
+
+  <!-- Nuitées vendues (mois courant) -->
+  <div class="card reservations" *ngIf="summary">
+    <div class="card-header">
+      <div class="card-title">Nuitées vendues (mois)</div>
+      <div class="card-icon"><i class="fas fa-calendar-check"></i></div>
+    </div>
+    <div class="card-value">{{ summary.nightsSoldInRange || 0 }}</div>
+    <div class="card-trend positive">
+      <i class="fas fa-arrow-up"></i>
+      <span>Estimation mensuelle</span>
+    </div>
+  </div>
+
+  <!-- Check-ins du jour -->
+  <div class="card checkins" *ngIf="summary">
+    <div class="card-header">
+      <div class="card-title">Check-ins (aujourd’hui)</div>
+      <div class="card-icon"><i class="fas fa-door-open"></i></div>
+    </div>
+    <div class="card-value">{{ summary.checkinsToday || 0 }}</div>
+    <div class="card-trend neutral">
+      <i class="fas fa-minus"></i>
+      <span>Journalier</span>
+    </div>
+  </div>
+
+  <!-- Taux d'occupation du jour -->
+  <div class="card occupancy" *ngIf="summary">
+    <div class="card-header">
+      <div class="card-title">Taux d'occupation (jour)</div>
+      <div class="card-icon"><i class="fas fa-chart-pie"></i></div>
+    </div>
+    <div class="card-value">
+      {{ (summary.occupancyRateToday || 0) | number:'1.0-1':currentLang.code }}%
+    </div>
+    <div class="card-trend positive">
+      <i class="fas fa-arrow-up"></i>
+      <span>vs hier (à venir)</span>
+    </div>
+  </div>
+
+  <!-- En attente -->
+  <div class="card pending" *ngIf="summary">
+    <div class="card-header">
+      <div class="card-title">En attente</div>
+      <div class="card-icon"><i class="fas fa-clock"></i></div>
+    </div>
+    <div class="card-value">{{ summary.pendingCount || 0 }}</div>
+    <div class="card-trend negative">
+      <i class="fas fa-arrow-down"></i>
+      <span>-2 depuis hier</span>
+    </div>
+  </div>
+</div>
+<app-ai-insight-card
+  [hotelId]="selectedHotelId"
+  [tz]="tz"
+  [windowDays]="7">
+</app-ai-insight-card>
+
+    <app-housekeeping-today
+  [hotelId]="selectedHotelId"
+  [tz]="tz">
+  </app-housekeeping-today>
+
+<app-rooms-board ></app-rooms-board>
+   
+    <!-- Actions rapides -->
+  
+
+    <!-- Graphe séries -->
+    <!-- <div class="panel chart-panel" *ngIf="overview">
+      <div class="panel-header">
+         <h3>Évolution {{ overview?.seriesByCheckin 'des check-ins' : 'des réservations' }}</h3> 
+        <span class="panel-subtitle" *ngIf="overview">Fenêtre: {{ overview.windowDays }}j</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="seriesChart" height="280"></canvas>
+      </div>
+    </div> -->
+
+    <!-- Dernières réservations en attente -->
+    <!-- <div class="panel table-panel">
+      <div class="panel-header">
+        <h3>Dernières réservations en attente</h3>
+        <button class="btn-secondary" (click)="goToPending()">Tout voir</button>
+      </div>
+      <div class="table-container" *ngIf="latestPending.length > 0; else noData">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Statut</th>
+              <th>Début</th>
+              <th>Fin</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of latestPending">
+              <td>{{ r.id }}</td>
+              <td><span class="badge">{{ r.statut }}</span></td>
+           <td>{{ r.dateDebut | date:'short':'':currentLang.code }}</td>
+<td>{{ r.dateFin   | date:'short':'':currentLang.code }}</td>
+
+              <td>
+                <ng-container *ngIf="r.chambreId; else svc">CHAMBRE</ng-container>
+                <ng-template #svc>SERVICE</ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #noData>
+        <div class="empty-state">
+          <i class="fas fa-inbox"></i>
+          <p>Aucune réservation en attente.</p>
+        </div>
+      </ng-template>
+    </div> -->
+
+    
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-left">
+        <p>&copy; 2024 StayPlace. Tous droits réservés.</p>
+      </div>
+      <div class="footer-right">
+        <a href="/support">Support</a>
+        <a href="/privacy">Confidentialité</a>
+        <a href="/terms">Conditions</a>
+      </div>
+    </div>
+  </footer>
+</div>

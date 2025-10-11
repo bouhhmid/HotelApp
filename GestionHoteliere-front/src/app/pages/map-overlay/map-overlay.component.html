@@ -1,0 +1,18 @@
+<!-- Backdrop plein écran -->
+<div class="overlay-backdrop">
+  <!-- Contenu centré -->
+  <div class="overlay-content">
+    <div class="overlay-header">
+      <h3>📍 Carte – {{ nomHotel }}</h3>
+      <!-- Bouton de fermeture -->
+      <a routerLink="/home" class="close-btn" aria-label="Fermer">✖</a>
+    </div>
+
+    <!-- La carte occupe tout l'espace restant -->
+    <app-leaflet-map
+      [latitude]="latitude"
+      [longitude]="longitude"
+      [zoom]="15">
+    </app-leaflet-map>
+  </div>
+</div>

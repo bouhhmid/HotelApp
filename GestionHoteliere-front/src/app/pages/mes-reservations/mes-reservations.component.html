@@ -1,0 +1,64 @@
+<div class="reservations-container">
+  <h2 class="title">📅 Mes Réservations</h2>
+
+  <!-- Barre de filtres -->
+  <div class="filter-bar">
+    <button [class.active]="selectedStatut === ''" (click)="filtrerParStatut('')">🗂 Toutes</button>
+    <button [class.active]="selectedStatut === 'EN_ATTENTE'" (click)="filtrerParStatut('EN_ATTENTE')">🕒 En attente</button>
+    <button [class.active]="selectedStatut === 'CONFIRME'" (click)="filtrerParStatut('CONFIRMEE')">✅ Confirmée</button>
+    <button [class.active]="selectedStatut === 'EXPIREE'" (click)="filtrerParStatut('EXPIREE')">⛔ Expirée</button>
+  </div>
+
+  <!-- Tableau de réservations -->
+  <table class="resa-table" *ngIf="reservations.length > 0; else noReservations">
+    <thead>
+      <tr>
+        <th>📅 Réservée le</th>
+        <th>Du</th> 
+        <th>Au</th>
+        <th>Statut</th>
+        <th>Type</th>
+        <th>ID Cible</th>
+        <th>Paiement</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of reservations">
+        <td>{{ r.dateReservation | date: 'short' }}</td>
+        <td>{{ r.dateDebut | date: 'shortDate' }}</td>
+        <td>{{ r.dateFin | date: 'shortDate' }}</td>
+        <td>
+          <span class="badge" [ngClass]="r?.statut.toLowerCase()">
+            {{ r.statut }}
+          </span>
+        </td>
+        <td>{{ r.chambreId ? 'Chambre' : 'Service' }}</td>
+        <td>{{ r.chambreId || r.serviceId }}</td>
+        <td>
+          <button 
+            *ngIf="r.statut === 'EN_ATTENTE'" 
+            (click)="payerReservation(r.id)" 
+            class="btn btn-success">
+            💳 Payer maintenant
+          </button>
+        </td>
+        <td>
+          <button (click)="annulerReservation(r.id)" class="btn btn-danger">Annuler</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Aucune réservation -->
+  <ng-template #noReservations>
+    <div class="no-reservation">Aucune réservation trouvée.</div>
+  </ng-template>
+
+  <!-- Pagination -->
+  <div class="pagination">
+    <button (click)="changerPage(-1)" [disabled]="page === 0">◀</button>
+    <span>Page {{ page + 1 }} / {{ totalPages }}</span>
+    <button (click)="changerPage(1)" [disabled]="page >= totalPages - 1">▶</button>
+  </div>
+</div>

@@ -1,0 +1,254 @@
+<div class="page" *ngIf="hotel$ | async as hotel">
+  <!-- HERO / bannière -->
+  <section class="hero">
+    <div
+      class="hero-bg"
+      [style.backgroundImage]="
+        hotel.imageUrl
+          ? (hotel.imageUrl.startsWith('http') ? 'url(' + hotel.imageUrl + ')' : 'url(assets/images/hotels/' + hotel.imageUrl + ')')
+          : 'url(assets/images/hotels/default.jpg)'
+      "
+    ></div>
+
+    <div class="hero-content">
+      <div class="left">
+        <h1 class="title">{{ hotel.nom }}</h1>
+        <div class="meta">
+          <span>📍 {{ hotel.ville || hotel.adresse }}</span>
+          <span class="stars">⭐ {{ hotel.nbEtoiles ?? hotel.etoiles }}</span>
+          <span class="badge">Très demandé</span>
+        </div>
+
+        <div class="proof">
+          <span>👀 {{ readingPeople }} personnes consultent cet hôtel</span>
+          <span>⏱ Dernière réservation il y a {{ lastBookingMinutes }} min</span>
+          <span *ngIf="lowStock" class="danger">⚡ Il ne reste que 2 chambres à ce prix</span>
+        </div>
+      </div>
+
+      <div class="right actions-quick">
+        <button class="btn ghost" (click)="openMap(hotel)">Voir sur la carte</button>
+        <button class="btn" (click)="scrollToChambres()">Voir les chambres</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Onglets simples -->
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab==='overview'" (click)="setTab('overview')">Aperçu</button>
+    <button class="tab" [class.active]="activeTab==='services'" (click)="setTab('services')">Services</button>
+    <button class="tab" [class.active]="activeTab==='map'" (click)="setTab('map')">Carte</button>
+    <button class="tab" [class.active]="activeTab==='reviews'" (click)="setTab('reviews')">Avis</button>
+  </div>
+<!-- passe l’id hôtel dynamique + le user connecté -->
+<app-spin-wheel
+  [hotelId]="(hotel$ | async)?.id"
+  [userId]="userName || 'guest'">
+</app-spin-wheel>
+
+  <div class="container">
+    <!-- Colonne principale -->
+    <div class="main">
+      <!-- SECTION APERÇU -->
+      <section class="card about" *ngIf="activeTab==='overview'">
+        <h3>À propos</h3>
+        <p class="lead">
+          {{ hotel.description || 'Hôtel apprécié pour son emplacement, ses équipements et son confort.' }}
+        </p>
+
+        <ul class="facts">
+          <li>🕒 Check-in : 14:00 • Check-out : 12:00</li>
+          <li>🛜 Wifi gratuit • 🅿 Parking • 🏊 Piscine</li>
+          <li>✈ Aéroport : ~ {{ hotel.distanceAeroport || 15 }} km</li>
+        </ul>
+      </section>
+
+      <!-- SECTION CHAMBRES -->
+      <section class="card" id="section-chambres">
+        <div class="section-head">
+          <h3>Chambres disponibles</h3>
+        </div>
+
+        <div class="chambres-list" *ngIf="chambresDisponibles$ | async as chambres; else noChambres">
+          <div class="chambre-item" *ngFor="let chambre of chambres">
+            <div class="chambre-image">
+              <img
+                [src]="chambre.imageUrl || 'assets/images/chambres/default.jpg'"
+                alt="Photo chambre"
+                (error)="onImgError($event)"
+              />
+            </div>
+
+            <div class="chambre-details">
+              <h4>{{ chambre.typeChambre }} - {{ chambre.numero }}</h4>
+              <p class="desc">{{ chambre.description }}</p>
+              <p class="price">
+                {{ chambre.prixBase| currency:'TND' }} <span>/ nuit</span>
+              </p>
+              <p class="capacity">👨‍👩‍👧 Adultes: {{ chambre.capaciteAdulte }} • 🧒 Enfants: {{ chambre.capaciteEnfant }}</p>
+
+              <div class="actions">
+                <button *ngIf="isClient" (click)="openReservationModal(chambre.id!)" class="btn">Réserver</button>
+                <button *ngIf="!isClient" (click)="redirectToLogin()" class="btn ghost">Se connecter</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noChambres>
+          <p class="empty-msg">Aucune chambre disponible pour le moment.</p>
+        </ng-template>
+      </section>
+
+      <!-- SECTION SERVICES -->
+      <section class="card" *ngIf="activeTab==='services'">
+        <div class="section-head">
+          <h3>Services de l'hôtel</h3>
+        </div>
+
+        <section class="services-section" *ngIf="hotel.serviceHotels?.length > 0">
+          <div class="services-list">
+            <div class="service-item" *ngFor="let service of hotel.serviceHotels">
+              <div class="service-info">
+                <h6>
+                  {{ service.nom || service.nomService }}
+                  <span class="service-type">{{ service.type }}</span>
+                </h6>
+                <p class="service-description">{{ service.description }}</p>
+
+                <div class="service-meta">
+                  <span *ngIf="service.capacite">👥 max {{ service.capacite }}</span>
+                  <span *ngIf="service.duree">⏱ {{ service.duree }}</span>
+                  <span *ngIf="service.horaire">🕒 {{ service.horaire }}</span>
+                </div>
+              </div>
+
+              <div class="service-actions">
+                <div class="service-prix">
+                  {{ service.prix | currency:'TND' }}
+                  <small *ngIf="service.unitePrix">/{{ service.unitePrix }}</small>
+                </div>
+
+                <button *ngIf="isClient" class="btn sm" (click)="openServiceReservationModal(service.id!)">
+                  Réserver
+                </button>
+                <button *ngIf="!isClient" class="btn sm ghost" (click)="redirectToLogin()">
+                  Se connecter
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <p *ngIf="!(hotel.serviceHotels?.length > 0)" class="muted">Aucun service n'est encore répertorié.</p>
+      </section>
+
+      <!-- SECTION CARTE INTÉGRÉE -->
+      <section class="card" id="section-map" *ngIf="activeTab==='map'">
+        <div class="section-head">
+          <h3>Localisation</h3>
+          <button class="link" (click)="openMap(hotel)">Ouvrir en plein écran</button>
+        </div>
+        <div class="map-embed">
+          <app-leaflet-map
+            [latitude]="hotel.latitude || hotel.lat"
+            [longitude]="hotel.longitude || hotel.lng"
+            [zoom]="14"
+          ></app-leaflet-map>
+        </div>
+      </section>
+
+      <!-- SECTION AVIS -->
+      <section class="card" *ngIf="activeTab==='reviews'">
+  <div class="section-head">
+    <h3>Avis des clients</h3>
+
+    <!-- Résumé -->
+    <ng-container *ngIf="agg$ | async as agg">
+      <div class="summary">
+        <span class="chip big">{{ agg.average | number:'1.1-1' }}</span>
+        <span class="count">{{ agg.count }} avis</span>
+        <button class="btn-secondary" (click)="refreshReviews()">Actualiser</button>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- Barres critères -->
+  <div class="ratings" *ngIf="ratings$ | async as ratings">
+    <div class="rate-line" *ngFor="let r of ratings">
+      <span class="k">{{ r.name }}</span>
+      <div class="bar"><div class="fill" [style.width.%]="r.value * 10"></div></div>
+      <span class="v">{{ r.value | number:'1.1-1' }}</span>
+    </div>
+  </div>
+
+  <!-- Liste des commentaires -->
+  <div class="comments" *ngIf="reviews$ | async as reviews">
+    <div class="comment" *ngFor="let c of reviews">
+      <div class="head">
+        <strong>{{ c.userName }}</strong>
+        <span class="chip">{{ c.score | number:'1.1-1' }}</span>
+      </div>
+      <div class="title">{{ c.title }}</div>
+      <p>{{ c.comment }}</p>
+      <small class="date">{{ c.createdAt | date:'medium' }}</small>
+    </div>
+
+    <!-- Loader + bouton "Voir plus" -->
+    <div class="more">
+      <div class="spinner" *ngIf="(loadingReviews$ | async)">Chargement…</div>
+      <button class="btn-secondary"
+              *ngIf="(hasMore$ | async) && !(loadingReviews$ | async)"
+              (click)="loadMoreReviews()">
+        Voir plus d'avis
+      </button>
+      <div class="empty" *ngIf="!reviews.length && !(loadingReviews$ | async)">
+        Aucun avis pour le moment.
+      </div>
+    </div>
+  </div>
+</section>
+
+    </div>
+
+    <!-- Colonne latérale sticky -->
+    <aside class="side">
+      <div class="sticky card">
+        <div class="sticky-head">
+          <div class="hotel-mini">
+            <div class="n">{{ hotel.nom }}</div>
+            <div class="s">⭐ {{ hotel.nbEtoiles ?? hotel.etoiles }}</div>
+          </div>
+        </div>
+
+        <ul class="sticky-bullets">
+          <li>✅ Annulation flexible (selon l’option)</li>
+          <li>🔐 Paiement sécurisé</li>
+          <li>⚡ Confirmation immédiate</li>
+        </ul>
+
+        <div class="sticky-actions">
+          <button class="btn wide" (click)="scrollToChambres()">Choisir une chambre</button>
+          <button class="btn ghost wide" (click)="openMap(hotel)">Voir sur la carte</button>
+        </div>
+
+        <div class="sticky-proof">
+          <span>👀 Très demandé aujourd’hui</span>
+          <span *ngIf="lowStock" class="danger">⚡ Peu de chambres restantes</span>
+        </div>
+      </div>
+
+      <!-- Infos utiles rapides -->
+      <div class="card card-mini">
+        <h4>Infos utiles</h4>
+        <ul class="mini-list">
+          <li>🕒 Réception 24/24</li>
+          <li>🧳 Bagagerie</li>
+          <li>🍳 Petit-déjeuner (option)</li>
+          <li>🐾 Animaux non admis</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</div>
+

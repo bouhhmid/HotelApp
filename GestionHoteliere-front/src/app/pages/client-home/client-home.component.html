@@ -1,0 +1,6 @@
+<h2>🏨 Bienvenue sur votre espace client</h2>
+<div *ngFor="let hotel of hotels" class="card">
+  <h3>{{ hotel.nom }}</h3>
+  <p>{{ hotel.description }}</p>
+  <button class="btn btn-primary" [routerLink]="['/hotel', hotel.id]">Voir</button>
+</div>

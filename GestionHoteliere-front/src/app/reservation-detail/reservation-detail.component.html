@@ -1,0 +1,17 @@
+<div *ngIf="reservation; else loading">
+  <h2>Détails de la réservation</h2>
+  <p><strong>ID :</strong> {{ reservation.id }}</p>
+  <p><strong>Chambre :</strong> {{ reservation.chambreId }}</p>
+  <p><strong>Date de début :</strong> {{ reservation.dateDebut }}</p>
+  <p><strong>Date de fin :</strong> {{ reservation.dateFin }}</p>
+  <p><strong>Statut :</strong> {{ reservation.statut }}</p>
+  <!-- Ajoutez d'autres informations nécessaires -->
+</div>
+
+<ng-template #loading>
+  <p>Chargement...</p>
+</ng-template>
+
+<ng-template #error>
+  <p>{{ error }}</p>
+</ng-template>

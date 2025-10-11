@@ -1,0 +1,57 @@
+<div class="wheel-container">
+  <div class="topbar">
+    <div class="status">
+      <span *ngIf="canSpin; else locked">🎉 1 tirage disponible aujourd’hui</span>
+      <ng-template #locked>
+        <span class="locked">⏳ Vous avez déjà joué aujourd’hui. Revenez demain.</span>
+      </ng-template>
+    </div>
+
+    <button class="mute" (click)="toggleMute()" [attr.aria-pressed]="muted">
+      {{ muted ? '🔇 Muet' : '🔊 Son' }}
+    </button>
+  </div>
+
+  <div class="stage">
+    <div class="pointer">▲</div>
+
+    <div
+      class="wheel"
+      [style.transform]="'rotate(' + rotation + 'deg)'"
+      [class.spinning]="spinning"
+      role="img"
+      aria-label="Roue de la chance"
+    >
+      <div
+        class="sector"
+        *ngFor="let prize of prizes; let i = index"
+        [style.transform]="'rotate(' + (i * (360 / prizes.length)) + 'deg)'"
+        [style.background]="getSectorColor(i)"
+        [style.clipPath]="'polygon(0% 0%, 100% 0%, 50% 100%)'"
+      >
+        <div class="content">
+          <div class="icon">{{ prize.icon }}</div>
+          <div class="label">{{ prize.label }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button
+    class="spin-btn"
+    (click)="spin()"
+    [disabled]="spinning || !canSpin"
+  >
+    🎡 Lancer la roue
+  </button>
+
+  <div class="result" *ngIf="result">
+    <div class="title">
+      {{ result.isLose ? 'Dommage' : 'Gagné !' }}
+    </div>
+    <div class="text">{{ message }}</div>
+    <div class="prize" *ngIf="!result.isLose">
+      {{ result.icon }} {{ result.label }}
+    </div>
+  </div>
+</div>

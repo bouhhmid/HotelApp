@@ -1,0 +1,54 @@
+<!-- src/app/admin/ajouter-chambre/ajouter-chambre.component.html -->
+<div class="form-container">
+  <h3>Ajouter une chambre</h3>
+
+  <form (ngSubmit)="ajouterChambre()" #formRef="ngForm">
+    <div class="form-group">
+      <label>Numéro</label>
+      <input type="text" class="form-control" name="numero" [(ngModel)]="form.numero" required>
+    </div>
+
+    <!-- (optionnel) Sélecteur type -->
+    <div class="form-group">
+      <label>Type de chambre</label>
+      <select class="form-control" name="typeChambre" [(ngModel)]="form.typeChambre" required>
+        <option *ngFor="let type of typeOptions" [value]="type">{{ type }}</option>
+      </select>
+    </div>
+
+    <!-- (optionnel) Sélecteur vue -->
+    <div class="form-group">
+      <label>Vue</label>
+      <select class="form-control" name="vue" [(ngModel)]="form.vue" required>
+        <option *ngFor="let v of vueOptions" [value]="v">{{ v }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Prix (TND)</label>
+      <input type="number" class="form-control" name="prixBase" [(ngModel)]="form.prixBase" required>
+    </div>
+
+    <div class="form-group">
+      <label>Capacité adultes</label>
+      <input type="number" class="form-control" name="capaciteAdulte" [(ngModel)]="form.capaciteAdulte" required>
+    </div>
+
+    <div class="form-group">
+      <label>Capacité enfants</label>
+      <input type="number" class="form-control" name="capaciteEnfant" [(ngModel)]="form.capaciteEnfant" required>
+    </div>
+
+    <div class="form-group">
+      <label>Image (URL)</label>
+      <input type="text" class="form-control" name="imageUrl" [(ngModel)]="form.imageUrl">
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <textarea class="form-control" name="description" [(ngModel)]="form.description" rows="3"></textarea>
+    </div>
+
+    <button class="btn btn-primary mt-3" type="submit">Ajouter</button>
+  </form>
+</div>
