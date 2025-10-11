@@ -25,7 +25,5 @@ HotelApp/
 - Notifications et gestion d’emails
 - Architecture propre et extensible
 
-## 👨‍💻 Auteur
-**Ahmed Ben Cheikh**  
-Projet académique encadré par *Mme Sirine Naifar*  
+
 [LinkedIn](https://www.linkedin.com/in/ahmedbencheikh/) • [GitHub](https://github.com/bouhhmid)
