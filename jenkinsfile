@@ -49,6 +49,13 @@ pipeline {
                             """
                         }
                     }
+                     stage('SonarQube Analysis') {
+                                steps {
+                                    withSonarQubeEnv('sonarQube_hotelapp') {
+                                        sh 'mvn sonar:sonar'
+                                    }
+                                }
+                            }
         }
         stage('Push Docker Image') {
                     steps {
