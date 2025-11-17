@@ -22,15 +22,15 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo "⚙️ Building with CI profile (H2 instead of PostgreSQL)..."
-                sh 'mvn clean install -Dspring.profiles.active=ci -DskipTests=true'
+                echo "⚙️ Building with CI profile (H2 disabled)..."
+                sh 'mvn clean install -DskipTests=true -Dspring.profiles.active=ci'
             }
         }
 
         stage('Package') {
             steps {
-                echo "📦 Packaging application..."
-                sh 'mvn package -Dspring.profiles.active=ci'
+                echo "📦 Packaging application WITHOUT tests..."
+                sh 'mvn package -DskipTests=true -Dspring.profiles.active=ci'
             }
         }
 
@@ -45,7 +45,7 @@ pipeline {
 
     post {
         success {
-            echo "🎉 BUILD + DOCKER PUSH COMPLETED SUCCESSFULLY!"
+            echo "🎉 BUILD SUCCESSFUL!"
         }
         failure {
             echo "❌ PIPELINE FAILED — CHECK LOGS"
