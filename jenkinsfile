@@ -50,7 +50,19 @@ pipeline {
                         }
                     }
         }
-
+        stage('Push Docker Image') {
+                    steps {
+                        script {
+                            echo "⬆️ Pushing Docker image to Docker Hub..."
+                            withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                                sh """
+                                    echo "$PASS" | docker login -u "$USER" --password-stdin
+                                    docker push $IMAGE_NAME:$IMAGE_TAG
+                                """
+                            }
+                        }
+                    }
+                }
 
 
 
