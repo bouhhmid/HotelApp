@@ -1,0 +1,14 @@
+spring:
+  profiles:
+    active: dev
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs
+
+stripe:
+  secret-key: YOUR_STRIPE_SECRET_KEY
+  webhook-secret: YOUR_STRIPE_WEBHOOK_SECRET

@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'M2_HOME'
+        jdk 'JAVA_HOME'
+    }
+
+    environment {
+        IMAGE_NAME = "ahmedbencheikh666/HotelApp"
+        IMAGE_TAG = "latest"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo "📥 Cloning project from GitHub..."
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "⚙️ Building with CI profile (H2 instead of PostgreSQL)..."
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                echo "📦 Packaging application..."
+                sh 'mvn package -Dspring.profiles.active=ci'
+            }
+        }
+
+        stage('Archive Artifact') {
+            steps {
+                echo "🗂️ Archiving .jar artifact..."
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
+        }
+
+    }
+
+    post {
+        success {
+            echo "🎉 BUILD + DOCKER PUSH COMPLETED SUCCESSFULLY!"
+        }
+        failure {
+            echo "❌ PIPELINE FAILED — CHECK LOGS"
+        }
+    }
+}
