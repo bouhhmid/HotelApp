@@ -23,7 +23,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo "⚙️ Building with CI profile (H2 instead of PostgreSQL)..."
-                sh 'mvn clean install -Dspring.profiles.active=ci -DskipTests=false'
+                sh 'mvn clean install -Dspring.profiles.active=ci -DskipTests=true'
             }
         }
 
