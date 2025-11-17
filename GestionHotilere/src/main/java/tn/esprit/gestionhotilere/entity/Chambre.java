@@ -41,10 +41,10 @@ public class Chambre {
     @Column(nullable = false)
     private boolean dispo = true;
 
-    @Column(length = 1024)
+    @Column(length = 5000)
     private String description;
 
-    @Column(length = 512)
+    @Column(length = 2024)
     private String imageUrl;
 
     @Column(name = "capacite_adulte", nullable = false)

@@ -41,6 +41,7 @@ Exemples :
 Phrase : "Bonjour"
 Réponse : {"intention": "salutation"}
 
+
 Phrase : "Merci pour votre aide"
 Réponse : {"intention": "remerciement"}
 
